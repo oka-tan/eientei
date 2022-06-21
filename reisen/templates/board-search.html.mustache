@@ -1,0 +1,469 @@
+<form action="/{{board}}/search" method="get" class="mb-5">
+	<div class="columns">
+		<div class="column">
+			<div class="field">
+				<label class="label has-text-white-bis">Thread No.</label>
+				<div class="control">
+					<input
+						class="input"
+						type="text"
+						pattern="\d+"
+						name="resto"
+						{{#search.Resto}}
+							value="{{search.Resto}}"
+						{{/search.Resto}}
+					/>
+				</div>
+			</div>
+			<div class="field">
+				<label class="label has-text-white-bis">Comment</label>
+				<div class="control">
+					<input
+						class="input"
+						type="text"
+						name="com"
+						{{#search}}
+							value="{{search.Com}}"
+						{{/search}}
+					/>
+				</div>
+			</div>
+			<div class="field">
+				<label class="label has-text-white-bis">Subject</label>
+				<div class="control">
+					<input
+						class="input"
+						type="text"
+						name="sub"
+						value="{{search.Sub}}"
+					/>
+				</div>
+			</div>
+			<div class="field">
+				<label class="label has-text-white-bis">Username</label>
+				<div class="control">
+					<input
+						class="input"
+						type="text"
+						name="name"
+						value="{{search.Name}}"
+					/>
+				</div>
+			</div>
+			<div class="field">
+				<label class="label has-text-white-bis">Tripcode</label>
+				<div class="control">
+					<input
+						class="input"
+						type="text"
+						name="trip"
+						value="{{search.Trip}}"
+					/>
+				</div>
+			</div>
+			<div class="field">
+				<label class="label has-text-white-bis">File Name</label>
+				<div class="control">
+					<input
+						class="input"
+						type="text"
+						name="filename"
+						value="{{search.Filename}}"
+					/>
+				</div>
+			</div>
+			<div class="field">
+				<label class="label has-text-white-bis">Image Hash (md5)</label>
+				<div class="control">
+					<input
+						class="input"
+						type="text"
+						name="md5"
+						{{#search}}
+							value="{{search.MD5}}"
+						{{/search}}
+					/>
+				</div>
+			</div>
+		</div>
+		<div class="column">
+			<label class="label has-text-white-bis">Capcode</label>
+			<div class="control mb-3">
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="capcode"
+						value=""
+						{{#search.AllCapcodes}}
+							checked
+						{{/search.AllCapcodes}}
+					>
+					All
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="capcode"
+						value="null"
+						{{#search.NoCapcode}}
+							checked
+						{{/search.NoCapcode}}
+					>
+					Only User Posts 
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="capcode"
+						value="mod"
+						{{#search.ModCapcode}}
+							checked
+						{{/search.ModCapcode}}
+					>
+					Only Moderator Posts 
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="capcode"
+						value="manager"
+						{{#search.ManagerCapcode}}
+							checked
+						{{/search.ManagerCapcode}}
+					>
+					Only Manager Posts 
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="capcode"
+						value="admin"
+						{{#search.AdminCapcode}}
+							checked
+						{{/search.AdminCapcode}}
+					>
+					Only Admin Posts 
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="capcode"
+						value="developer"
+						{{#search.DeveloperCapcode}}
+							checked
+						{{/search.DeveloperCapcode}}
+					>
+					Only Developer Posts 
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="capcode"
+						value="founder"
+						{{#search.FounderCapcode}}
+							checked
+						{{/search.FounderCapcode}}
+					>
+					Only Founder Posts 
+				</label>
+			</div>
+			<label class="label has-text-white-bis">Filter Images</label>
+			<div class="control mb-3">
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="image"
+						value=""
+						{{#search.AllImages}}
+							checked
+						{{/search.AllImages}}
+					>
+					All
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="image"
+						value="image"
+						{{#search.HasImage}}
+							checked
+						{{/search.HasImage}}
+					>
+					Only Posts With Images
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="image"
+						value="noImage"
+						{{#search.NoImage}}
+							checked
+						{{/search.NoImage}}
+					>
+					Only Posts Without Images
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="image"
+						value="spoiler"
+						{{#search.Spoiler}}
+							checked
+						{{/search.Spoiler}}
+					>
+					Only Posts With Spoiler Images
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="image"
+						value="noSpoiler"
+						{{#search.NoSpoiler}}
+							checked
+						{{/search.NoSpoiler}}
+					>
+					Only Posts With Non-Spoiler Images
+				</label>
+			</div>
+			<label class="label has-text-white-bis">Filter Deleted Posts</label>
+			<div class="control mb-3">
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="deleted"
+						value=""
+						{{#search.AllDeleted}}
+							checked
+						{{/search.AllDeleted}}
+					>
+					All Posts
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="deleted"
+						value="true"
+						{{#search.JustDeleted}}
+							checked
+						{{/search.JustDeleted}}
+					>
+					Only Deleted Posts
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="op"
+						value="false"
+						{{#search.NoDeleted}}
+							checked
+						{{/search.NoDeleted}}
+					>
+					Only Non-Deleted Posts
+				</label>
+			</div>
+			<label class="label has-text-white-bis">Filter OPs</label>
+			<div class="control mb-3">
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="op"
+						value=""
+						{{#search.AllOPs}}
+							checked
+						{{/search.AllOPs}}
+					>
+					All Posts
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="op"
+						value="sticky"
+						{{#search.JustSticky}}
+							checkec
+						{{/search.JustSticky}}
+					>
+					Only Sticky Thread OPs
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="op"
+						value="noSticky"
+						{{#search.NoSticky}}
+							checked
+						{{/search.NoSticky}}
+					>
+					Only Non-Sticky Thread OPs
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="op"
+						value="op"
+						{{#search.JustOP}}
+							checked
+						{{/search.JustOP}}
+					>
+					Only Thread OPs
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="op"
+						value="reply"
+						{{#search.JustReply}}
+							checked
+						{{/search.JustReply}}
+					>
+					Only Non-OPs
+				</label>
+			</div>
+			<button
+				type="submit"
+				class="button has-text-white-bis"
+				style="background-color: DarkViolet; border: 0px;"
+			>
+				Search
+			</button>
+		</div>
+	</div>
+</form>
+
+{{#error}}
+	<h1 class="title has-text-white-bis">
+		{{error}}
+	</h1>
+{{/error}}
+
+{{#result}}
+      <div class="mb-2 columns has-text-white-bis">
+		{{^TimIsNil}}
+			<div class="column is-narrow">
+				<a 
+					href="{{conf.ImagesUrl}}/{{board}}/{{DerefTim}}{{DerefExt}}"
+					target="_blank"
+				>
+					<img
+						src="{{conf.ThumbnailsUrl}}/{{board}}/{{DerefTim}}s.jpg"
+						alt="Image not available"
+						style="height: {{DerefTnH}}px; width: {{DerefTnW}}px;"
+					/>
+				</a>
+				<p class="has-text-centered">
+					<small>{{DerefW}}x{{DerefH}}</small>
+				</p>
+				<p class="has-text-centered">
+					<small>{{DerefFilenameShort}}{{DerefExt}}</small>
+				</p>
+			</div>
+		{{/TimIsNil}}
+            <div class="column">
+                  <p>
+                        {{^SubIsNil}}
+                              <span style="color: BlueViolet">{{{DerefSub}}}</span>
+                        {{/SubIsNil}}
+                        <strong class="has-text-white">{{FormatName}}</strong>
+                        <span>
+                              {{FormatTime}}
+                              <a href="/{{board}}/thread/{{Resto}}">No. {{No}}</a>
+                        </span>
+                  </p>
+                  {{^ComIsNil}}
+                        <p>{{{DerefCom}}}</p>
+                  {{/ComIsNil}}
+            </div>
+      </div>
+{{/result}}
+<form action="/{{board}}/search" method="get">
+	<input
+		type="hidden"
+		name="resto"
+		{{#search.Resto}}
+			value="{{search.Resto}}"
+		{{/search.Resto}}
+	/>
+	<input
+		type="hidden"
+		name="com"
+		value="{{search.Com}}"
+	/>
+	<input
+		type="hidden"
+		name="sub"
+		value="{{search.Sub}}"
+	/>
+	<input
+		type="hidden"
+		name="name"
+		value="{{search.Name}}"
+	/>
+	<input
+		type="hidden"
+		name="trip"
+		value="{{search.Trip}}"
+	/>
+	<input
+		type="hidden"
+		name="filename"
+		value="{{search.Filename}}"
+	/>
+	<input
+		type="hidden"
+		name="md5"
+		value="{{search.MD5}}"
+	/>
+	<input
+		type="hidden"
+		name="capcode"
+		value="{{search.Capcode}}"
+	/>
+	<input
+		type="hidden"
+		name="image"
+		value="{{search.Image}}"
+	/>
+	<input
+		type="hidden"
+		name="deleted"
+		value="{{search.Deleted}}"
+	/>
+	<input
+		type="hidden"
+		name="op"
+		value="{{search.OP}}"
+	/>
+	<nav class="pagination" role="navigation" aria-label="pagination">
+		{{#rkeyset}}
+			<button
+				class="pagination-previous has-text-white-bis"
+				style="background-color: DarkViolet; border: 0px;"
+				name="rkeyset"
+				value="{{rkeyset}}"
+			>
+				Previous page
+			</button>
+		{{/rkeyset}}
+		{{^rkeyset}}
+			<button class="pagination-previous" disabled>
+				Previous page
+			</button>
+		{{/rkeyset}}
+
+		{{#keyset}}
+			<button
+				class="pagination-next has-text-white-bis"
+				style="background-color: DarkViolet; border: 0px;"
+				name="keyset"
+				value="{{keyset}}"
+			>
+				Next page
+			</button>
+		{{/keyset}}
+		{{^keyset}}
+			<button class="pagination-next" disabled>
+				Next page
+			</button>
+		{{/keyset}}
+	</nav>
+</form>

@@ -1,0 +1,16 @@
+[Unit]
+Description=Reisen Archive Frontend
+Documentation=https://github.com/oka-tan/eientei
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/john/eientei/reisen
+ExecStart=/home/john/eientei/reisen/reisen /home/john/eientei/reisen/config.json
+Restart=on-failure
+RestartSec=30
+TimeoutStopSec=180
+
+[Install]
+WantedBy=multi-user.target
+

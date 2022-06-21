@@ -1,0 +1,5 @@
+.gitignore
+kaguya
+readme.md
+kaguya.service
+config.json.example

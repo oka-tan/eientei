@@ -1,0 +1,25 @@
+{
+	"PostgresConfig": {
+		"ConnectionString": "postgres://eientei:eientei@db:5432/eientei?sslmode=disable"
+	},
+	"Host": ["eientei.xyz", "www.eientei.xyz"],
+	"Production": false,
+	"Boards": [
+		{
+			"Name": "sci",
+			"Description": "Science & Mathematics"
+		},
+		{
+			"Name": "wsr",
+			"Description": "Worksafe Requests"
+		}
+	],
+	"CspConfig": "default-src 'self' https://example.cloudfront.net; style-src 'unsafe-inline' https://example.cloudfront.net https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css; script-src https://example.cloudfront.net https://cdnjs.cloudflare.com; font-src https://cdnjs.cloudflare.com;",
+	"TemplateConfig": {
+		"ImagesUrl": "https://example.cloudfront.net",
+		"ThumbnailsUrl": "https://example.cloudfront.net",
+		"FaviconUrl": "https://example.cloudfront.net/static/favicon.ico",
+		"JsUrl": "https://example.cloudfront.net/static/reisen.js",
+		"CssUrl": "https://example.cloudfront.net/static/reisen.css"
+	}
+}

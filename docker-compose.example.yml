@@ -1,0 +1,30 @@
+version: "3.9"
+
+volumes:
+  postgres:
+
+services:
+  kaguya:
+    build: ./kaguya
+    environment:
+      AWS_ACCESS_KEY_ID: "aba"
+      AWS_SECRET_ACCESS_KEY: "ubu"
+
+  reisen:
+    build: ./reisen
+    deploy:
+      replicas: 1
+    ports:
+      - "1323:1323"
+
+  db:
+    image: postgres:14.3-alpine
+    environment:
+      POSTGRES_PASSWORD: "eientei"
+      POSTGRES_USER: "eientei"
+      POSTGRES_DB: "eientei"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - postgres:/var/lib/postgresql/data/pgdata
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
