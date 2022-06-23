@@ -27,18 +27,18 @@ CREATE UNIQUE INDEX post_since4pass_time_no_index ON post(board, time, no) WHERE
 Text search indexes.
 The duplication SHOULD be cheap, but I might also be wrong and stupid.
 */
-CREATE INDEX post_com_index ON post USING GIN (board, com_tsvector) WHERE com_tsvector IS NOT NULL;
-CREATE INDEX post_name_index ON post USING GIN (board, name_tsvector) WHERE name_tsvector IS NOT NULL;
-CREATE INDEX post_filename_index ON post USING GIN (board, filename_tsvector) WHERE filename_tsvector IS NOT NULL;
+CREATE INDEX post_com_index ON post USING GIN (board, com_tsvector);
+CREATE INDEX post_name_index ON post USING GIN (board, name_tsvector);
+CREATE INDEX post_filename_index ON post USING GIN (board, filename_tsvector);
 
-CREATE INDEX post_sub_index ON post USING GIN (board, sub_tsvector) WHERE sub_tsvector IS NOT NULL;
-CREATE INDEX post_op_com_index ON post USING GIN (board, com_tsvector) WHERE com_tsvector IS NOT NULL AND op;
-CREATE INDEX post_op_name_index ON post USING GIN (board, name_tsvector) WHERE name_tsvector IS NOT NULL AND op;
-CREATE INDEX post_op_filename_index ON post USING GIN (board, filename_tsvector) WHERE filename_tsvector IS NOT NULL AND op;
+CREATE INDEX post_sub_index ON post USING GIN (board, sub_tsvector);
+CREATE INDEX post_op_com_index ON post USING GIN (board, com_tsvector) WHERE op;
+CREATE INDEX post_op_name_index ON post USING GIN (board, name_tsvector) WHERE op;
+CREATE INDEX post_op_filename_index ON post USING GIN (board, filename_tsvector) WHERE op;
 
-CREATE INDEX post_deleted_com_index ON post USING GIN(board, com_tsvector) WHERE com_tsvector IS NOT NULL AND deleted;
-CREATE INDEX post_deleted_name_index ON post USING GIN(board, name_tsvector) WHERE name_tsvector IS NOT NULL AND deleted;
-CREATE INDEX post_deleted_filename_index ON post USING GIN(board, filename_tsvector) WHERE filename_tsvector IS NOT NULL AND deleted;
+CREATE INDEX post_deleted_com_index ON post USING GIN(board, com_tsvector) WHERE deleted;
+CREATE INDEX post_deleted_name_index ON post USING GIN(board, name_tsvector) WHERE deleted;
+CREATE INDEX post_deleted_filename_index ON post USING GIN(board, filename_tsvector) WHERE deleted;
 
-CREATE INDEX post_image_com_index ON post USING GIN(board, com_tsvector) WHERE com_tsvector IS NOT NULL AND tim IS NOT NULL;
-CREATE INDEX post_image_name_index ON post USING GIN(board, name_tsvector) WHERE name_tsvector IS NOT NULL AND tim IS NOT NULL;
+CREATE INDEX post_image_com_index ON post USING GIN(board, com_tsvector) WHERE tim IS NOT NULL;
+CREATE INDEX post_image_name_index ON post USING GIN(board, name_tsvector) WHERE tim IS NOT NULL;
