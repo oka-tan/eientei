@@ -20,6 +20,9 @@
 		</div>
 		<div class="column">
 			<p>
+				{{Deleted}}
+					<span style="color: red">DELETED</span>
+				{{/Deleted}}
 				{{^SubIsNil}}
 					<span style="color: BlueViolet">{{{DerefSub}}}</span>
 				{{/SubIsNil}}
@@ -56,6 +59,9 @@
 		{{/TimIsNil}}
 		<div class="column">
 			<p>
+				{{Deleted}}
+					<span style="color: red">DELETED</span>
+				{{/Deleted}}
 				<strong class="has-text-white">{{FormatName}}</strong>
 				<span>
 					{{FormatTime}} <a href="#p{{No}}">No. {{No}}</a>
