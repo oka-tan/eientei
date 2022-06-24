@@ -204,7 +204,7 @@ func BoardSearch(pg *bun.DB, conf config.Config) func(echo.Context) error {
 			q.Where("no > ?", req.RKeyset)
 		}
 
-		q.Order("no DESC").Limit(50)
+		q.Order("no DESC").Limit(24)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 		defer cancel()
@@ -214,18 +214,11 @@ func BoardSearch(pg *bun.DB, conf config.Config) func(echo.Context) error {
 			return c.Render(http.StatusOK, "board-search-error", model)
 		}
 
-		resultLen := 24
-		if len(result) < 24 {
-			resultLen = len(result)
-		}
-
-		result = result[:resultLen]
-
 		if len(result) == 24 {
 			model["keyset"] = result[23].No
 		}
 
-		if req.Keyset != 0 {
+		if req.Keyset != 0 || req.RKeyset != 0 {
 			model["rkeyset"] = result[0].No
 		}
 
