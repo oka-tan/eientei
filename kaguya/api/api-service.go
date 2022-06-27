@@ -213,3 +213,41 @@ func (s *Service) GetThread(no int64) (map[int64]Post, error) {
 
 	return posts, nil
 }
+
+func (s *Service) GetThreadArray(no int64) ([]Post, error) {
+
+	url := fmt.Sprintf("%s/%s/thread/%d.json", s.host, s.boardName, no)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+
+	if err != nil {
+		return nil, fmt.Errorf("Error constructing thread request:\nURL: %s\nError: %s", url, err)
+	}
+
+	resp, err := s.client.Do(req)
+
+	if err != nil {
+		return nil, fmt.Errorf("Error performing thread request:\nURL: %s\nError: %s", url, err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("Error processing thread response:\nURL: %s\nError: status code is %d", url, resp.StatusCode)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, fmt.Errorf("Error reading thread response's body:\nURL: %s\nError: %s", url, err)
+	}
+
+	var thread Thread
+
+	err = json.Unmarshal(body, &thread)
+
+	if err != nil {
+		return nil, fmt.Errorf("Error unmarshalling response body:\nBody: %s\nError: %s", body, err)
+	}
+
+	return thread.Posts, nil
+}

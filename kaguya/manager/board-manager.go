@@ -6,6 +6,7 @@ import (
 	"kaguya/config"
 	"kaguya/db"
 	"kaguya/images"
+	"kaguya/thumbnails"
 	"log"
 	"time"
 
@@ -14,13 +15,16 @@ import (
 
 //BoardManager is a service responsible for organizing and timing the scraping.
 type BoardManager struct {
-	apiService    api.Service
-	dbService     db.Service
-	imagesService images.Service
-	boardName     string
-	threads       map[int64]cachedThread
-	napTime       time.Duration
-	longNapTime   time.Duration
+	apiService        api.Service
+	dbService         db.Service
+	imagesService     images.Service
+	thumbnailsService thumbnails.Service
+	boardName         string
+	threads           map[int64]cachedThread
+	napTime           time.Duration
+	longNapTime       time.Duration
+	images            bool
+	thumbnails        bool
 }
 
 //NewBoardManager creates and returns a BoardManager instance specific to some board.
@@ -30,6 +34,7 @@ func NewBoardManager(
 	boardConfig config.BoardConfig,
 	pg *bun.DB,
 	imagesService images.Service,
+	thumbnailsService thumbnails.Service,
 ) (BoardManager, error) {
 	apiService, err := api.NewService(
 		apiConfig,
@@ -55,13 +60,16 @@ func NewBoardManager(
 	longNapTime, _ := time.ParseDuration(boardConfig.LongNapTime)
 
 	return BoardManager{
-		apiService:    apiService,
-		dbService:     dbService,
-		boardName:     boardConfig.Name,
-		imagesService: imagesService,
-		threads:       threads,
-		napTime:       napTime,
-		longNapTime:   longNapTime,
+		apiService:        apiService,
+		dbService:         dbService,
+		boardName:         boardConfig.Name,
+		imagesService:     imagesService,
+		thumbnailsService: thumbnailsService,
+		threads:           threads,
+		napTime:           napTime,
+		longNapTime:       longNapTime,
+		images:            boardConfig.Images,
+		thumbnails:        boardConfig.Thumbnails,
 	}, nil
 }
 
@@ -79,44 +87,65 @@ func (c *BoardManager) Init() error {
 		return err
 	}
 
-	newPosts := make([]api.Post, 0, 10)
-
 	for no := range archive {
 		time.Sleep(c.napTime)
 
-		posts, err := c.apiService.GetThread(no)
+		posts, err := c.apiService.GetThreadArray(no)
 
 		if err != nil {
 			log.Printf("Error looking up thread %d: %s\n", no, err)
 			continue
 		}
 
-		for _, p := range posts {
-			newPosts = append(newPosts, p)
+		if err = c.dbService.Upsert(posts); err != nil {
+			return err
+		}
+
+		if c.images {
+			c.imagesService.Enqueue(c.boardName, posts)
+		}
+
+		if c.thumbnails {
+			c.thumbnailsService.Enqueue(c.boardName, posts)
 		}
 	}
+
+	log.Printf("Finished up with the archive for board %s, moving on to the catalog\n", c.boardName)
 
 	for _, thread := range catalog {
 		time.Sleep(c.napTime)
 
-		posts, err := c.apiService.GetThread(thread.No)
+		posts, err := c.apiService.GetThreadArray(thread.No)
 
 		if err != nil {
 			return fmt.Errorf("Error looking up thread %d: %s", thread.No, err)
 		}
 
-		c.threads[thread.No] = cachedThread{
-			lastModified: thread.LastModified,
-			posts:        toCachedPosts(posts),
+		if err = c.dbService.Upsert(posts); err != nil {
+			return err
 		}
 
+		if c.images {
+			c.imagesService.Enqueue(c.boardName, posts)
+		}
+
+		if c.thumbnails {
+			c.thumbnailsService.Enqueue(c.boardName, posts)
+		}
+
+		postsMap := make(map[int64]api.Post)
+
 		for _, p := range posts {
-			newPosts = append(newPosts, p)
+			postsMap[p.No] = p
+		}
+
+		c.threads[thread.No] = cachedThread{
+			lastModified: thread.LastModified,
+			posts:        toCachedPosts(postsMap),
 		}
 	}
 
-	c.imagesService.Enqueue(c.boardName, newPosts)
-	return c.dbService.Upsert(newPosts)
+	return nil
 }
 
 //Run is the main method for a BoardManager.
@@ -253,22 +282,23 @@ func (c *BoardManager) Run() error {
 			}
 		}
 
-		err = c.dbService.Delete(deletedPosts)
-
-		if err != nil {
+		if err = c.dbService.Delete(deletedPosts); err != nil {
 			return err
 		}
 
-		err = c.dbService.Update(editedPosts)
-
-		if err != nil {
+		if c.dbService.Update(editedPosts); err != nil {
 			return err
 		}
 
-		c.imagesService.Enqueue(c.boardName, newPosts)
-		err = c.dbService.Insert(newPosts)
+		if c.images {
+			c.imagesService.Enqueue(c.boardName, newPosts)
+		}
 
-		if err != nil {
+		if c.thumbnails {
+			c.thumbnailsService.Enqueue(c.boardName, newPosts)
+		}
+
+		if c.dbService.Insert(newPosts); err != nil {
 			return err
 		}
 	}

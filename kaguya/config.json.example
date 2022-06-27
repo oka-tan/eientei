@@ -1,5 +1,6 @@
 {
 	"ApiConfig": {
+		"NapTime": "2s",
 		"RequestTimeout": "10s",
 		"Host": "https://a.4cdn.org"
 	},
@@ -10,14 +11,23 @@
 		"AwsRegion": "us-east-2",
 		"BucketName": "eientei"
 	},
+	"ThumbnailsConfig": {
+		"NapTime": "0.5s",
+		"RequestTimeout": "10s",
+		"Host": "https://is2.4chan.org",
+		"AwsRegion": "us-east-2",
+		"BucketName": "eientei"
+	},
 	"PostgresConfig": {
 		"ConnectionString": "postgres://eientei:eientei@db:5432/eientei?sslmode=disable"
 	},
 	"Boards": [
 		{
-			"Name": "po",
-			"NapTime": "5s",
-			"LongNapTime": "60s"
+			"Name": "v",
+			"Thumbnails": false,
+			"LongNapTime": "60s",
+			"NapTime": "0.1s",
+			"Images": false
 		}
 	]
 }

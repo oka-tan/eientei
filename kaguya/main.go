@@ -6,6 +6,7 @@ import (
 	"kaguya/config"
 	"kaguya/images"
 	"kaguya/manager"
+	"kaguya/thumbnails"
 	"log"
 
 	"github.com/uptrace/bun"
@@ -34,6 +35,7 @@ func main() {
 	s3Client := s3.NewFromConfig(awsConfig)
 
 	imagesService := images.NewService(conf.ImagesConfig, s3Client)
+	thumbnailsService := thumbnails.NewService(conf.ThumbnailsConfig, s3Client)
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(conf.PostgresConfig.ConnectionString)))
 	pg := bun.NewDB(sqldb, pgdialect.New())
 
@@ -42,7 +44,7 @@ func main() {
 
 			log.Printf("Creating board manager for %+v", boardConfig)
 
-			boardManager, err := manager.NewBoardManager(apiConfig, boardConfig, pg, imagesService)
+			boardManager, err := manager.NewBoardManager(apiConfig, boardConfig, pg, imagesService, thumbnailsService)
 
 			if err != nil {
 				log.Panicf("Error initiating board manager:\nBoard: %s\nError: %s", boardConfig.Name, err)
@@ -70,6 +72,10 @@ func main() {
 	go func(imagesService images.Service) {
 		imagesService.Run()
 	}(imagesService)
+
+	go func(thumbnailsService thumbnails.Service) {
+		thumbnailsService.Run()
+	}(thumbnailsService)
 
 	forever := make(chan bool)
 	<-forever

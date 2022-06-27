@@ -9,10 +9,11 @@ import (
 
 //Config parametrizes Kaguya's configuration.
 type Config struct {
-	APIConfig      APIConfig
-	ImagesConfig   ImagesConfig
-	Boards         []BoardConfig
-	PostgresConfig PostgresConfig
+	APIConfig        APIConfig
+	ImagesConfig     ImagesConfig
+	ThumbnailsConfig ImagesConfig
+	Boards           []BoardConfig
+	PostgresConfig   PostgresConfig
 }
 
 //APIConfig parametrizes Kaguya's configuration for the consumption of 4chan's API.
@@ -40,6 +41,8 @@ type BoardConfig struct {
 	Name        string
 	NapTime     string
 	LongNapTime string
+	Thumbnails  bool
+	Images      bool
 }
 
 //LoadConfig reads config.json and unmarshals it into a Config struct.

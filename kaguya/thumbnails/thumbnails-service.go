@@ -1,4 +1,4 @@
-package images
+package thumbnails
 
 import (
 	"context"
@@ -13,15 +13,15 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-type queuedImage struct {
-	Ext   string
+//QueuedImage is an image to be downloaded from 4chan and uploaded to S3.
+type queuedThumbnail struct {
 	Tim   int64
 	Board string
 }
 
 //Service is a singleton that obtains and uploads images to S3.
 type Service struct {
-	Queue      chan queuedImage
+	Queue      chan queuedThumbnail
 	host       string
 	client     http.Client
 	s3Client   *s3.Client
@@ -43,7 +43,7 @@ func NewService(
 	napTime, _ := time.ParseDuration(imagesConfig.NapTime)
 
 	return Service{
-		Queue:      make(chan queuedImage, 10000),
+		Queue:      make(chan queuedThumbnail, 20000),
 		host:       imagesConfig.Host,
 		bucketName: imagesConfig.BucketName,
 		client:     client,
@@ -54,10 +54,9 @@ func NewService(
 
 func (s *Service) Enqueue(boardName string, posts []api.Post) {
 	for _, p := range posts {
-		if p.Tim != nil && p.Ext != nil {
-			s.Queue <- queuedImage{
+		if p.Tim != nil {
+			s.Queue <- queuedThumbnail{
 				Tim:   *(p.Tim),
-				Ext:   *(p.Ext),
 				Board: boardName,
 			}
 		}
@@ -66,10 +65,9 @@ func (s *Service) Enqueue(boardName string, posts []api.Post) {
 
 func (s *Service) EnqueueMap(boardName string, posts map[int64]api.Post) {
 	for _, p := range posts {
-		if p.Tim != nil && p.Ext != nil {
-			s.Queue <- queuedImage{
+		if p.Tim != nil {
+			s.Queue <- queuedThumbnail{
 				Tim:   *(p.Tim),
-				Ext:   *(p.Ext),
 				Board: boardName,
 			}
 		}
@@ -79,8 +77,9 @@ func (s *Service) EnqueueMap(boardName string, posts map[int64]api.Post) {
 //Run is the main loop for images.Service instances.
 func (s *Service) Run() {
 	uploader := manager.NewUploader(s.s3Client)
+
 	for image := range s.Queue {
-		file := fmt.Sprintf("%s/%d%s", image.Board, image.Tim, image.Ext)
+		file := fmt.Sprintf("%s/%ds.jpg", image.Board, image.Tim)
 
 		_, err := s.s3Client.HeadObject(context.Background(), &s3.HeadObjectInput{
 			Bucket: &s.bucketName,
