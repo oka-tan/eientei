@@ -43,7 +43,7 @@ func NewService(
 	napTime, _ := time.ParseDuration(imagesConfig.NapTime)
 
 	return Service{
-		Queue:      make(chan queuedThumbnail, 20000),
+		Queue:      make(chan queuedThumbnail, 100000),
 		host:       imagesConfig.Host,
 		bucketName: imagesConfig.BucketName,
 		client:     client,
@@ -80,15 +80,6 @@ func (s *Service) Run() {
 
 	for image := range s.Queue {
 		file := fmt.Sprintf("%s/%ds.jpg", image.Board, image.Tim)
-
-		_, err := s.s3Client.HeadObject(context.Background(), &s3.HeadObjectInput{
-			Bucket: &s.bucketName,
-			Key:    &file,
-		})
-
-		if err == nil {
-			continue
-		}
 
 		time.Sleep(s.napTime)
 
