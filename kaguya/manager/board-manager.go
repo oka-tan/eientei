@@ -118,7 +118,8 @@ func (c *BoardManager) Init() error {
 		posts, err := c.apiService.GetThreadArray(thread.No)
 
 		if err != nil {
-			return fmt.Errorf("Error looking up thread %d: %s", thread.No, err)
+			log.Printf("Error looking up thread %d: %s", thread.No, err)
+			continue
 		}
 
 		if err = c.dbService.Upsert(posts); err != nil {
