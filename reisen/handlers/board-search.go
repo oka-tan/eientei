@@ -24,6 +24,7 @@ type SearchRequest struct {
 	Image    string `query:"image"`
 	Deleted  string `query:"deleted"`
 	OP       string `query:"op"`
+	Anon     string `query:"anon"`
 	Keyset   int64  `query:"keyset"`
 	RKeyset  int64  `query:"rkeyset"`
 }
@@ -108,6 +109,26 @@ func (s SearchRequest) JustReply() bool {
 	return s.OP == "reply"
 }
 
+func (s SearchRequest) AllPosters() bool {
+	return s.Anon == ""
+}
+
+func (s SearchRequest) Anonymous() bool {
+	return s.Anon == "anon"
+}
+
+func (s SearchRequest) Namefag() bool {
+	return s.Anon == "namefag"
+}
+
+func (s SearchRequest) Tripfag() bool {
+	return s.Anon == "tripfag"
+}
+
+func (s SearchRequest) NameAndTripfag() bool {
+	return s.Anon == "nameAndTripfag"
+}
+
 func BoardSearch(pg *bun.DB, conf config.Config) func(echo.Context) error {
 	return func(c echo.Context) error {
 		board := c.Param("board")
@@ -167,34 +188,79 @@ func BoardSearch(pg *bun.DB, conf config.Config) func(echo.Context) error {
 		}
 
 		if req.Image != "" {
-			if req.Image == "image" {
-				q.Where("tim IS NOT NULL")
-			} else if req.Image == "noImage" {
-				q.Where("tim IS NULL")
-			} else if req.Image == "spoiler" {
-				q.Where("tim IS NOT NULL AND spoiler")
-			} else if req.Image == "noSpoiler" {
-				q.Where("tim IS NOT NULL AND NOT spoiler")
+			switch req.Image {
+			case "image":
+				{
+					q.Where("tim IS NOT NULL")
+				}
+			case "noImage":
+				{
+					q.Where("tim IS NULL")
+				}
+			case "spoiler":
+				{
+					q.Where("tim IS NOT NULL AND spoiler")
+				}
+			case "noSpoiler":
+				{
+					q.Where("tim IS NOT NULL AND NOT spoiler")
+				}
 			}
 		}
 
 		if req.Deleted != "" {
-			if req.Deleted == "true" {
-				q.Where("deleted")
-			} else if req.Deleted == "false" {
-				q.Where("NOT deleted")
+			switch req.Deleted {
+			case "true":
+				{
+					q.Where("deleted")
+				}
+			case "false":
+				{
+					q.Where("NOT deleted")
+				}
 			}
 		}
 
 		if req.OP != "" {
-			if req.OP == "sticky" {
-				q.Where("op AND sticky")
-			} else if req.OP == "noSticky" {
-				q.Where("op AND NOT sticky")
-			} else if req.OP == "op" {
-				q.Where("op")
-			} else if req.OP == "reply" {
-				q.Where("NOT op")
+			switch req.OP {
+			case "sticky":
+				{
+					q.Where("op AND sticky")
+				}
+			case "noSticky":
+				{
+					q.Where("op AND NOT sticky")
+				}
+			case "op":
+				{
+					q.Where("op")
+				}
+			case "reply":
+				{
+					q.Where("NOT op")
+				}
+			}
+		}
+
+		if req.Anon != "" {
+			switch req.Anon {
+			case "anon":
+				{
+					q.Where("name IS NULL AND trip IS NULL")
+				}
+			case "namefag":
+				{
+					q.Where("name IS NOT NULL")
+				}
+			case "tripfag":
+				{
+					q.Where("trip IS NOT NULL")
+				}
+			case "nameAndTripfag":
+				{
+					q.Where("name IS NOT NULL")
+					q.Where("trip IS NOT NULL")
+				}
 			}
 		}
 

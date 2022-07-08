@@ -280,7 +280,7 @@
 						name="op"
 						value="sticky"
 						{{#search.JustSticky}}
-							checkec
+							checked
 						{{/search.JustSticky}}
 					>
 					Only Sticky Thread OPs
@@ -317,6 +317,64 @@
 						{{/search.JustReply}}
 					>
 					Only Non-OPs
+				</label>
+			</div>
+			<label class="label has-text-white-bis">Filter Posters</label>
+			<div class="control mb-3">
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="anon"
+						value=""
+						{{#search.AllPosters}}
+							checked
+						{{/search.AllPosters}}
+					>
+					All Posters
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="anon"
+						value="anon"
+						{{#search.Anonymous}}
+							checked
+						{{/search.Anonymous}}
+					>
+					Only Anonymous
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="anon"
+						value="namefag"
+						{{#search.Namefag}}
+							checked
+						{{/search.Namefag}}
+					>
+					Only Namefags
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="anon"
+						value="tripfag"
+						{{#search.Tripfag}}
+							checked
+						{{/search.Tripfag}}
+					>
+					Only Tripfags
+				</label>
+				<label class="radio has-text-white-bis">
+					<input
+						type="radio"
+						name="anon"
+						value="nameAndTripfag"
+						{{#search.NameAndTripfag}}
+							checked
+						{{/search.NameAndTripfag}}
+					>
+					Only Posters Tripfagging and Namefagging
 				</label>
 			</div>
 			<button
