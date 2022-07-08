@@ -12,6 +12,7 @@ CREATE UNIQUE INDEX post_md5_no_index ON post (board, md5, no) WHERE md5 IS NOT 
 CREATE UNIQUE INDEX post_trip_no_index ON post (board, trip, no) WHERE trip IS NOT NULL;
 CREATE UNIQUE INDEX post_country_no_index ON post (board, country, no) WHERE country IS NOT NULL;
 CREATE UNIQUE INDEX post_name_not_null_index ON post(board, no) WHERE name IS NOT NULL;
+CREATE UNIQUE INDEX post_trip_not_null_index ON post(board, no) WHERE trip IS NOT NULL;
 CREATE UNIQUE INDEX post_name_trip_not_null_index ON post(board, no) WHERE name IS NOT NULL AND trip IS NOT NULL;
 
 /*
