@@ -8,6 +8,8 @@ import (
 	"kaguya/manager"
 	"kaguya/thumbnails"
 	"log"
+	"runtime"
+	"time"
 
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
@@ -18,6 +20,7 @@ import (
 )
 
 func main() {
+	runtime.GOMAXPROCS(1)
 	log.Println("Starting Kaguya")
 
 	conf, err := config.LoadConfig()
@@ -72,6 +75,16 @@ func main() {
 	go func(thumbnailsService thumbnails.Service) {
 		thumbnailsService.Run()
 	}(thumbnailsService)
+
+	//Kaguya hoards substantially more memory than it actually uses, for some reason.
+	//It's a GC tuning problem and not something I can actually solve by just rewriting the code.
+	//Except golang doesn't really allow for any GC tuning other than this.
+	go func() {
+		for {
+			runtime.GC()
+			time.Sleep(time.Minute)
+		}
+	}()
 
 	forever := make(chan bool)
 	<-forever
