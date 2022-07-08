@@ -14,6 +14,7 @@ type Config struct {
 	ThumbnailsConfig ImagesConfig
 	Boards           []BoardConfig
 	PostgresConfig   PostgresConfig
+	SkipArchive      bool
 }
 
 //APIConfig parametrizes Kaguya's configuration for the consumption of 4chan's API.

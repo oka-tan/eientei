@@ -74,43 +74,46 @@ func NewBoardManager(
 }
 
 //Init puts a BoardManager in working conditions.
-func (c *BoardManager) Init() error {
+func (c *BoardManager) Init(skipArchive bool) error {
+
+	if !skipArchive {
+		archive, err := c.apiService.GetArchive()
+
+		if err != nil {
+			return err
+		}
+
+		for no := range archive {
+			time.Sleep(c.napTime)
+
+			posts, err := c.apiService.GetThreadArray(no)
+
+			if err != nil {
+				log.Printf("Error looking up thread %d: %s\n", no, err)
+				continue
+			}
+
+			if err = c.dbService.Upsert(posts); err != nil {
+				return err
+			}
+
+			if c.images {
+				c.imagesService.Enqueue(c.boardName, posts)
+			}
+
+			if c.thumbnails {
+				c.thumbnailsService.Enqueue(c.boardName, posts)
+			}
+		}
+	}
+
+	log.Printf("Finished up with the archive for board %s, moving on to the catalog\n", c.boardName)
+
 	catalog, err := c.apiService.GetCatalog()
 
 	if err != nil {
 		return err
 	}
-
-	archive, err := c.apiService.GetArchive()
-
-	if err != nil {
-		return err
-	}
-
-	for no := range archive {
-		time.Sleep(c.napTime)
-
-		posts, err := c.apiService.GetThreadArray(no)
-
-		if err != nil {
-			log.Printf("Error looking up thread %d: %s\n", no, err)
-			continue
-		}
-
-		if err = c.dbService.Upsert(posts); err != nil {
-			return err
-		}
-
-		if c.images {
-			c.imagesService.Enqueue(c.boardName, posts)
-		}
-
-		if c.thumbnails {
-			c.thumbnailsService.Enqueue(c.boardName, posts)
-		}
-	}
-
-	log.Printf("Finished up with the archive for board %s, moving on to the catalog\n", c.boardName)
 
 	for _, thread := range catalog {
 		time.Sleep(c.napTime)

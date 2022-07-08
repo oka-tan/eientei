@@ -52,17 +52,13 @@ func main() {
 
 			log.Printf("Initing board manager for board %s", boardConfig.Name)
 
-			err = boardManager.Init()
-
-			if err != nil {
+			if err := boardManager.Init(conf.SkipArchive); err != nil {
 				panic(err)
 			}
 
 			log.Printf("Running boardManager for board %s", boardConfig.Name)
 
-			err = boardManager.Run()
-
-			if err != nil {
+			if err := boardManager.Run(); err != nil {
 				panic(err)
 			}
 

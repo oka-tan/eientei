@@ -23,11 +23,12 @@
 	},
 	"Boards": [
 		{
-			"Name": "v",
-			"Thumbnails": false,
+			"Name": "po",
 			"LongNapTime": "60s",
 			"NapTime": "0.1s",
-			"Images": false
+			"Thumbnails": true,
+			"Images": true
 		}
-	]
+	],
+    "SkipArchive": true
 }
