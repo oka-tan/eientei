@@ -1,34 +1,37 @@
 {
 	"ApiConfig": {
 		"NapTime": "2s",
-		"RequestTimeout": "10s",
+		"RequestTimeout": "30s",
 		"Host": "https://a.4cdn.org"
 	},
 	"ImagesConfig": {
-		"NapTime": "2s",
-		"RequestTimeout": "10s",
+		"NapTime": "0.5s",
+		"RequestTimeout": "20s",
 		"Host": "https://is2.4chan.org",
-		"AwsRegion": "us-east-2",
-		"BucketName": "eientei"
+        "S3Host": "http://s3:9000",
+		"Region": "us-east-2",
+		"Bucket": "eientei"
 	},
 	"ThumbnailsConfig": {
-		"NapTime": "0.5s",
+		"NapTime": "0.1s",
 		"RequestTimeout": "10s",
 		"Host": "https://is2.4chan.org",
-		"AwsRegion": "us-east-2",
-		"BucketName": "eientei"
+        "S3Host": "http://s3:9000",
+		"Region": "us-east-2",
+		"Bucket": "eientei"
 	},
 	"PostgresConfig": {
 		"ConnectionString": "postgres://eientei:eientei@db:5432/eientei?sslmode=disable"
 	},
+    "InitialNap": "20s",
+    "SkipArchive": true,
 	"Boards": [
 		{
-			"Name": "po",
-			"LongNapTime": "60s",
-			"NapTime": "0.1s",
+			"Name": "a",
+			"LongNapTime": "600s",
+			"NapTime": "0.5s",
 			"Thumbnails": true,
 			"Images": true
 		}
-	],
-    "SkipArchive": true
+	]
 }
