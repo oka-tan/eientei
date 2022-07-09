@@ -8,7 +8,7 @@
 		"NapTime": "0.5s",
 		"RequestTimeout": "20s",
 		"Host": "https://is2.4chan.org",
-        "S3Host": "http://s3:9000",
+		"S3Host": "http://s3:9000",
 		"Region": "us-east-2",
 		"Bucket": "eientei"
 	},
@@ -16,7 +16,7 @@
 		"NapTime": "0.1s",
 		"RequestTimeout": "10s",
 		"Host": "https://is2.4chan.org",
-        "S3Host": "http://s3:9000",
+		"S3Host": "http://s3:9000",
 		"Region": "us-east-2",
 		"Bucket": "eientei"
 	},
