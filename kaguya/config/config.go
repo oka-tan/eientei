@@ -14,6 +14,7 @@ type Config struct {
 	ThumbnailsConfig ImagesConfig
 	Boards           []BoardConfig
 	PostgresConfig   PostgresConfig
+	InitialNap       string
 	SkipArchive      bool
 }
 
@@ -28,8 +29,9 @@ type ImagesConfig struct {
 	NapTime        string
 	RequestTimeout string
 	Host           string
-	AwsRegion      string
-	BucketName     string
+	S3Host         string
+	Region         string
+	Bucket         string
 }
 
 //PostgresConfig parametrizes Kaguya's configuration for PostgreSQL
@@ -69,4 +71,24 @@ func LoadConfig() (Config, error) {
 	}
 
 	return conf, nil
+}
+
+func (c *Config) StartImagesService() bool {
+	for _, b := range c.Boards {
+		if b.Images {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (c *Config) StartThumbnailsService() bool {
+	for _, b := range c.Boards {
+		if b.Thumbnails {
+			return true
+		}
+	}
+
+	return false
 }

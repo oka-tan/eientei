@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"kaguya/config"
 	"kaguya/images"
@@ -14,9 +13,6 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
-
-	awsconfig "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 func main() {
@@ -29,18 +25,34 @@ func main() {
 		log.Panicf("Error loading configuration: %s", err)
 	}
 
-	awsConfig, err := awsconfig.LoadDefaultConfig(context.Background(), awsconfig.WithRegion(conf.ImagesConfig.AwsRegion))
+	var imagesService *images.Service
 
-	if err != nil {
-		log.Panicf("Error loading AWS configuration: %s", err)
+	if conf.StartImagesService() {
+		imagesServiceP := images.NewService(conf.ImagesConfig)
+		imagesService = &imagesServiceP
 	}
 
-	s3Client := s3.NewFromConfig(awsConfig)
+	var thumbnailsService *thumbnails.Service
+	if conf.StartThumbnailsService() {
+		thumbnailsServiceP := thumbnails.NewService(conf.ThumbnailsConfig)
+		thumbnailsService = &thumbnailsServiceP
+	}
 
-	imagesService := images.NewService(conf.ImagesConfig, s3Client)
-	thumbnailsService := thumbnails.NewService(conf.ThumbnailsConfig, s3Client)
 	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(conf.PostgresConfig.ConnectionString)))
 	pg := bun.NewDB(sqldb, pgdialect.New())
+	initialNap, _ := time.ParseDuration(conf.InitialNap)
+
+	if imagesService != nil {
+		go func(imagesService *images.Service) {
+			imagesService.Run()
+		}(imagesService)
+	}
+
+	if thumbnailsService != nil {
+		go func(thumbnailsService *thumbnails.Service) {
+			thumbnailsService.Run()
+		}(thumbnailsService)
+	}
 
 	for _, boardConfig := range conf.Boards {
 		go func(apiConfig config.APIConfig, boardConfig config.BoardConfig, pg *bun.DB) {
@@ -66,25 +78,9 @@ func main() {
 			}
 
 		}(conf.APIConfig, boardConfig, pg)
+
+		time.Sleep(initialNap)
 	}
-
-	go func(imagesService images.Service) {
-		imagesService.Run()
-	}(imagesService)
-
-	go func(thumbnailsService thumbnails.Service) {
-		thumbnailsService.Run()
-	}(thumbnailsService)
-
-	//Kaguya hoards substantially more memory than it actually uses, for some reason.
-	//It's a GC tuning problem and not something I can actually solve by just rewriting the code.
-	//Except golang doesn't really allow for any GC tuning other than this.
-	go func() {
-		for {
-			runtime.GC()
-			time.Sleep(time.Minute)
-		}
-	}()
 
 	forever := make(chan bool)
 	<-forever

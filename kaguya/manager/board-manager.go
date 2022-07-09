@@ -17,8 +17,8 @@ import (
 type BoardManager struct {
 	apiService        api.Service
 	dbService         db.Service
-	imagesService     images.Service
-	thumbnailsService thumbnails.Service
+	imagesService     *images.Service
+	thumbnailsService *thumbnails.Service
 	boardName         string
 	threads           map[int64]cachedThread
 	napTime           time.Duration
@@ -33,8 +33,8 @@ func NewBoardManager(
 	apiConfig config.APIConfig,
 	boardConfig config.BoardConfig,
 	pg *bun.DB,
-	imagesService images.Service,
-	thumbnailsService thumbnails.Service,
+	imagesService *images.Service,
+	thumbnailsService *thumbnails.Service,
 ) (BoardManager, error) {
 	apiService, err := api.NewService(
 		apiConfig,

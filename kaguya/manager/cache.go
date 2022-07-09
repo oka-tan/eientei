@@ -6,8 +6,7 @@ type cachedThread struct {
 }
 
 type cachedPost struct {
-	no          int64
-	comHash     uint64
+	comHash     uint32
 	fileDeleted bool
 	sticky      bool
 }

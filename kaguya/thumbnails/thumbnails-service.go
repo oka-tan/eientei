@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
@@ -21,20 +23,44 @@ type queuedThumbnail struct {
 
 //Service is a singleton that obtains and uploads images to S3.
 type Service struct {
-	Queue      chan queuedThumbnail
-	host       string
-	client     http.Client
-	s3Client   *s3.Client
-	napTime    time.Duration
-	bucketName string
+	Queue    chan queuedThumbnail
+	host     string
+	client   http.Client
+	s3Client *s3.Client
+	napTime  time.Duration
+	bucket   string
 }
 
 //NewService creates and returns a new images.Service
 func NewService(
 	imagesConfig config.ImagesConfig,
-	s3Client *s3.Client,
 ) Service {
 	requestTimeout, _ := time.ParseDuration(imagesConfig.RequestTimeout)
+
+	customResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
+		if imagesConfig.S3Host != "" {
+			return aws.Endpoint{
+				PartitionID:       "aws",
+				URL:               imagesConfig.S3Host,
+				SigningRegion:     imagesConfig.Region,
+				HostnameImmutable: true,
+			}, nil
+		}
+		// returning EndpointNotFoundError will allow the service to fallback to it's default resolution
+		return aws.Endpoint{}, &aws.EndpointNotFoundError{}
+	})
+
+	s3Config, err := awsconfig.LoadDefaultConfig(
+		context.Background(),
+		awsconfig.WithEndpointResolver(customResolver),
+		awsconfig.WithRegion(imagesConfig.Region),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	s3Client := s3.NewFromConfig(s3Config)
 
 	client := http.Client{
 		Timeout: requestTimeout,
@@ -43,12 +69,12 @@ func NewService(
 	napTime, _ := time.ParseDuration(imagesConfig.NapTime)
 
 	return Service{
-		Queue:      make(chan queuedThumbnail, 100000),
-		host:       imagesConfig.Host,
-		bucketName: imagesConfig.BucketName,
-		client:     client,
-		napTime:    napTime,
-		s3Client:   s3Client,
+		Queue:    make(chan queuedThumbnail, 100000),
+		host:     imagesConfig.Host,
+		bucket:   imagesConfig.Bucket,
+		client:   client,
+		napTime:  napTime,
+		s3Client: s3Client,
 	}
 }
 
@@ -76,7 +102,10 @@ func (s *Service) EnqueueMap(boardName string, posts map[int64]api.Post) {
 
 //Run is the main loop for images.Service instances.
 func (s *Service) Run() {
-	uploader := manager.NewUploader(s.s3Client)
+	//4chan thumbnails hardly even surpass 20kb
+	uploader := manager.NewUploader(s.s3Client, func(u *manager.Uploader) {
+		u.BufferProvider = manager.NewBufferedReadSeekerWriteToPool(64 * 1024)
+	})
 
 	for image := range s.Queue {
 		file := fmt.Sprintf("%s/%ds.jpg", image.Board, image.Tim)
@@ -100,7 +129,7 @@ func (s *Service) Run() {
 		contentType := resp.Header["Content-Type"][0]
 
 		_, err = uploader.Upload(context.Background(), &s3.PutObjectInput{
-			Bucket:      &s.bucketName,
+			Bucket:      &s.bucket,
 			Key:         &file,
 			Body:        resp.Body,
 			ContentType: &contentType,

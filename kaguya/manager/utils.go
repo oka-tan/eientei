@@ -6,13 +6,13 @@ import (
 	"kaguya/utils"
 )
 
-func comHash(com *string) uint64 {
-	var comHash uint64
+func comHash(com *string) uint32 {
+	var comHash uint32
 
 	if com != nil {
-		hash := fnv.New64()
+		hash := fnv.New32()
 		hash.Sum([]byte(*com))
-		comHash = hash.Sum64()
+		comHash = hash.Sum32()
 	} else {
 		comHash = 0
 	}
@@ -32,7 +32,6 @@ func toCachedPosts(thread map[int64]api.Post) map[int64]cachedPost {
 
 func toCachedPost(p api.Post) cachedPost {
 	return cachedPost{
-		no:          p.No,
 		comHash:     comHash(p.Com),
 		fileDeleted: utils.ToBool(p.FileDeleted),
 		sticky:      utils.ToBool(p.Sticky),
