@@ -47,7 +47,8 @@ CREATE TABLE post (
 ) PARTITION BY LIST(board);
 
 CREATE INDEX post_resto_no_index ON post(resto, no);
-CREATE INDEX post_deleted_no_index ON post (no) WHERE deleted;
+CREATE INDEX post_deleted_no_index ON post(no) WHERE deleted;
+CREATE INDEX post_op_no_index ON post(no) WHERE op;
 
 CREATE TABLE post_a PARTITION OF post
 FOR VALUES IN ('a');
