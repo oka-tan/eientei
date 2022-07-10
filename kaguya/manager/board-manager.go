@@ -286,7 +286,7 @@ func (c *BoardManager) Run() error {
 			}
 		}
 
-		if err = c.dbService.Delete(deletedPosts); err != nil {
+		if err = c.dbService.Delete(deletedPosts, c.boardName); err != nil {
 			return err
 		}
 

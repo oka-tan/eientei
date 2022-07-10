@@ -51,3 +51,11 @@ func toModel(boardName string, p api.Post) post {
 		Sticky:        utils.ToBool(p.Sticky),
 	}
 }
+
+func min(i1 int, i2 int) int {
+	if i1 > i2 {
+		return i2
+	} else {
+		return i1
+	}
+}
