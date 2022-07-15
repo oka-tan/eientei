@@ -1,0 +1,142 @@
+{
+    "override_if_exists": true,
+    "index": {
+        "name": "post_a",
+        "storage_type": "filesystem",
+        "use_fast_fuzzy": false,
+        "strip_stop_words": true,
+        "fields": {
+            "no": {
+                "type": "i64",
+                "stored": true,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "resto": {
+                "type": "i64",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "time": {
+                "type": "date",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "name": {
+                "type": "text",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "trip": {
+                "type": "string",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "capcode": {
+                "type": "string",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "country": {
+                "type": "string",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "since4pass": {
+                "type": "u64",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "sub": {
+                "type": "text",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "com": {
+                "type": "text",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "md5": {
+                "type": "string",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "filename": {
+                "type": "text",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "ext": {
+                "type": "string",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "deleted": {
+                "type": "u64",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "file_deleted": {
+                "type": "u64",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "spoiler": {
+                "type": "u64",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "op": {
+                "type": "u64",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            },
+            "sticky": {
+                "type": "u64",
+                "stored": false,
+                "indexed": true,
+                "multi": false,
+                "fast": true
+            }
+        },
+        "search_fields": [],
+        "reader_threads": 1,
+        "max_concurrency": 2,
+        "writer_buffer": 300000,
+        "writer_threads": 1
+    }
+}

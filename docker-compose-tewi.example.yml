@@ -3,17 +3,41 @@ version: "3.9"
 volumes:
   postgres:
   compressed:
+  lnx:
+  s3:
 
 services:
   kaguya:
     build: ./kaguya
     deploy:
       replicas: 1
-    ports:
-      - "6060:6060"
     environment:
       AWS_ACCESS_KEY_ID: "eientei"
       AWS_SECRET_ACCESS_KEY: "12345678"
+
+  tewi:
+    build: ./tewi
+    deploy:
+      replicas: 1
+    ports:
+      - "1323:1323"
+
+  moon:
+    build: ./moon
+    deploy:
+      replicas: 0
+
+  lnx:
+    image: chillfish8/lnx:latest
+    ports:
+      - "8000:8000"
+    deploy:
+      replicas: 1
+    environment:
+      - AUTHORIZATION_KEY=123
+      - LOG_LEVEL=info
+    volumes:
+      - lnx:/index
 
   db:
     image: postgres:14.3-alpine
@@ -38,3 +62,5 @@ services:
     command: "server /data --console-address \":9001\""
     volumes:
       - s3:/data
+    deploy:
+      replicas: 0
