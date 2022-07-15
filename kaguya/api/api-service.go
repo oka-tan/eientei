@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"kaguya/config"
 	"net/http"
 	"time"
@@ -74,18 +73,13 @@ func (s *Service) GetCatalog() (map[int64]CatalogThread, error) {
 		return nil, fmt.Errorf("Error processing catalog response:\nURL:%s\nError: status code is %d", url, resp.StatusCode)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("Error reading catalog response's body:\nURL: %s\nError: %s", url, err)
-	}
-
 	var pages []CatalogPage
 
-	err = json.Unmarshal(body, &pages)
+	jsonDecoder := json.NewDecoder(resp.Body)
+	err = jsonDecoder.Decode(&pages)
 
 	if err != nil {
-		return nil, fmt.Errorf("Error unmarshalling response body of catalog request:\nURL: %s\nBody: %s\nError: %s", url, body, err)
+		return nil, fmt.Errorf("Error unmarshalling response body of catalog request:\nURL: %s\nError: %s", url, err)
 	}
 
 	catalog := make(map[int64]CatalogThread)
@@ -137,18 +131,13 @@ func (s *Service) GetArchive() (map[int64]bool, error) {
 		return nil, fmt.Errorf("Error processing archive response:\nURL: %s\nError: status code is %d", url, resp.StatusCode)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("Error reading archive response's body:\nURL: %s\nError: %s", url, err)
-	}
-
 	var archiveJSON []int64
 
-	err = json.Unmarshal(body, &archiveJSON)
+	jsonDecoder := json.NewDecoder(resp.Body)
+	err = jsonDecoder.Decode(&archiveJSON)
 
 	if err != nil {
-		return nil, fmt.Errorf("Error unmarshalling archive response body:\nBody: %s\nError: %s", body, err)
+		return nil, fmt.Errorf("Error unmarshalling archive response body: %s", err)
 	}
 
 	archive := make(map[int64]bool)
@@ -191,18 +180,13 @@ func (s *Service) GetThread(no int64) (map[int64]Post, error) {
 		return nil, fmt.Errorf("Error processing thread response:\nURL: %s\nError: status code is %d", url, resp.StatusCode)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("Error reading thread response's body:\nURL: %s\nError: %s", url, err)
-	}
-
 	var thread Thread
 
-	err = json.Unmarshal(body, &thread)
+	jsonDecoder := json.NewDecoder(resp.Body)
+	err = jsonDecoder.Decode(&thread)
 
 	if err != nil {
-		return nil, fmt.Errorf("Error unmarshalling response body:\nBody: %s\nError: %s", body, err)
+		return nil, fmt.Errorf("Error unmarshalling response body:\nError: %s", err)
 	}
 
 	posts := make(map[int64]Post)
@@ -235,18 +219,13 @@ func (s *Service) GetThreadArray(no int64) ([]Post, error) {
 		return nil, fmt.Errorf("Error processing thread response:\nURL: %s\nError: status code is %d", url, resp.StatusCode)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("Error reading thread response's body:\nURL: %s\nError: %s", url, err)
-	}
-
 	var thread Thread
 
-	err = json.Unmarshal(body, &thread)
+	jsonDecoder := json.NewDecoder(resp.Body)
+	err = jsonDecoder.Decode(&thread)
 
 	if err != nil {
-		return nil, fmt.Errorf("Error unmarshalling response body:\nBody: %s\nError: %s", body, err)
+		return nil, fmt.Errorf("Error unmarshalling response body: %s", err)
 	}
 
 	return thread.Posts, nil
