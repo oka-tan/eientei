@@ -21,6 +21,7 @@ func toModel(boardName string, p api.Post) post {
 	} else {
 		resto = p.No
 	}
+	now := time.Now()
 
 	return post{
 		Board:         boardName,
@@ -49,6 +50,8 @@ func toModel(boardName string, p api.Post) post {
 		CustomSpoiler: p.CustomSpoiler,
 		Op:            (p.Resto == 0),
 		Sticky:        utils.ToBool(p.Sticky),
+		LastModified:  now,
+		CreatedAt:     now,
 	}
 }
 

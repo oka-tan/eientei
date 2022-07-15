@@ -97,7 +97,7 @@ func (s *Service) Upsert(
 			NewInsert().
 			Model(&posts).
 			On("CONFLICT (board, no) DO UPDATE").
-			Set("com = EXCLUDED.com, file_deleted = EXCLUDED.file_deleted, sticky = EXCLUDED.sticky").
+			Set("com = EXCLUDED.com, file_deleted = EXCLUDED.file_deleted, sticky = EXCLUDED.sticky, last_modified = EXCLUDED.last_modified").
 			Returning("NULL").
 			Exec(context.Background())
 
@@ -117,7 +117,7 @@ func (s *Service) Upsert(
 		NewInsert().
 		Model(&posts).
 		On("CONFLICT (board, no) DO UPDATE").
-		Set("com = EXCLUDED.com, file_deleted = EXCLUDED.file_deleted, sticky = EXCLUDED.sticky").
+		Set("com = EXCLUDED.com, file_deleted = EXCLUDED.file_deleted, sticky = EXCLUDED.sticky, last_modified = EXCLUDED.last_modified").
 		Returning("NULL").
 		Exec(context.Background())
 
@@ -149,6 +149,7 @@ func (s *Service) Update(updatedPosts []api.Post) error {
 			Set("com = _data.com").
 			Set("file_deleted = _data.file_deleted").
 			Set("sticky = _data.sticky").
+			Set("last_modified = _data.last_modified").
 			Where("post.no = _data.no").
 			Returning("NULL").
 			Exec(context.Background())
@@ -172,6 +173,7 @@ func (s *Service) Update(updatedPosts []api.Post) error {
 		Set("com = _data.com").
 		Set("file_deleted = _data.file_deleted").
 		Set("sticky = _data.sticky").
+		Set("last_modified = _data.last_modified").
 		Where("post.no = _data.no").
 		Returning("NULL").
 		Exec(context.Background())

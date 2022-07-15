@@ -41,6 +41,8 @@ CREATE TABLE post (
 	sub_tsvector TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', sub)) STORED,
 	com_tsvector TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', com)) STORED,
 	filename_tsvector TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', filename)) STORED,
+    last_modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 
 	PRIMARY KEY(board, no)
 ) PARTITION BY LIST(board);

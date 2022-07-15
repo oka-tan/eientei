@@ -42,13 +42,22 @@ CREATE TABLE post (
 	custom_spoiler SMALLINT,
 	op BOOLEAN NOT NULL,
 	sticky BOOLEAN NOT NULL,
+    last_modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 
 	PRIMARY KEY(board, no)
 ) PARTITION BY LIST(board);
 
+CREATE TABLE index_tracker (
+    board board NOT NULL PRIMARY KEY,
+    last_modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    no BIGINT NOT NULL
+);
+
 CREATE INDEX post_resto_no_index ON post(resto, no);
 CREATE INDEX post_deleted_no_index ON post(no) WHERE deleted;
 CREATE INDEX post_op_no_index ON post(no) WHERE op;
+CREATE INDEX post_last_modified_index ON post(last_modified, no);
 
 CREATE TABLE post_a PARTITION OF post
 FOR VALUES IN ('a');

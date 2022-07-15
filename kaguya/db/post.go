@@ -35,4 +35,6 @@ type post struct {
 	CustomSpoiler *int8     `bun:"custom_spoiler"`
 	Op            bool      `bun:"op"`
 	Sticky        bool      `bun:"sticky"`
+	CreatedAt     time.Time `bun:"created_at,notnull"`
+	LastModified  time.Time `bun:"last_modified,notnull"`
 }
