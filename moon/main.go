@@ -69,7 +69,7 @@ func main() {
 				err := d.NewSelect().
 					Model(&dbPosts).
 					Where("board = ?", board).
-					Where("last_modified > ? OR (last_modified = ? AND no > ?)", indexTracker.LastModified, indexTracker.LastModified, indexTracker.No).
+					Where("(last_modified, no) > (?, ?)", indexTracker.LastModified, indexTracker.No).
 					Order("last_modified ASC", "no ASC").
 					Limit(int(conf.BatchSize)).
 					Scan(context.Background())
