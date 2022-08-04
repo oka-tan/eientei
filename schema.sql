@@ -38,6 +38,7 @@ CREATE TABLE post (
     posters SMALLINT CHECK(posters > 0),
     replies SMALLINT CHECK(replies >= 0),
     since4pass SMALLINT CHECK(since4pass > 2011),
+    oekaki_internal_hash BYTEA CHECK(OCTET_LENGTH(oekaki_internal_hash) > 0),
     
     CONSTRAINT replies_need_to_come_after_the_op CHECK(post_number >= thread_number),
     CONSTRAINT only_ops_have_subjects CHECK(op OR subject IS NULL),
