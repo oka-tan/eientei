@@ -1,0 +1,110 @@
+version: "3.9"
+
+volumes:
+  postgres:
+  mysql:
+  s3:
+  lnx:
+  asagi-media:
+
+services:
+  reisen:
+    image: ghcr.io/oka-tan/reisen:0.0.1
+    environment:
+      - REISEN_CONFIG=/etc/reisen.json
+    volumes:
+      - ./reisen.json:/etc/reisen.json
+    deploy:
+      replicas: 1
+
+  moon:
+    image: ghcr.io/oka-tan/moon:0.0.1
+    environment:
+      - MOON_CONFIG=/etc/moon.json
+    volumes:
+      - ./moon.json:/etc/moon.json
+    deploy:
+      replicas: 0
+
+  kaguya:
+    image: ghcr.io/oka-tan/kaguya:0.0.1
+    environment:
+      - KAGUYA_CONFIG=/etc/kaguya.json
+    volumes:
+      - ./kaguya.json:/etc/kaguya.json
+    deploy:
+      replicas: 0
+
+  # Importer, usually shouldn't be enabled.
+  mokou:
+    image: ghcr.io/oka-tan/mokou:0.0.1
+    environment:
+      - MOKOU_CONFIG=/etc/mokou.json
+    volumes:
+      - ./mokou.json:/etc/mokou.json
+      - asagi-media:/asagi-media
+    deploy:
+      replicas: 0
+
+  # Asagi scraper for importer reliability testing.  
+  neofuuka:
+    image: ghcr.io/oka-tan/neofuuka:force-newest
+    volumes:
+      - ./neofuuka.json:/neofuuka/scraper.json
+      - asagi-media:/asagi-media
+    deploy:
+      replicas: 0
+
+  # Mysql db for importer reliability testing.
+  mysql:
+    image: mysql:8.0.30-debian
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345678
+      - MYSQL_DATABASE=asagi
+      - MYSQL_USER=asagi
+      - MYSQL_PASSWORD=12345678
+    volumes:
+      - ./asagi-schema-main.sql:/docker-entrypoint-initdb.d/asagi-schema-main.sql
+      - ./asagi-schema-triggers.sql:/docker-entrypoint-initdb.d/asagi-schema-triggers.sql
+      - mysql:/var/lib/mysql
+    deploy:
+      replicas: 0
+    
+  envoy:
+    image: envoyproxy/envoy:v1.23.0
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    ports:
+      - "80:80"
+
+  postgres:
+    image: postgres:14.4-alpine
+    environment:
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - PGDATA=/var/lib/postgresql/data/14.3
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  s3:
+    image: quay.io/minio/minio
+    command: "server /data --console-address \":9001\""
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=12345678
+    ports:
+      - "9001:9001"
+      - "9000:9000"
+    volumes:
+      - s3:/data
+    deploy:
+      replicas: 1
+
+  lnx:
+    image: chillfish8/lnx:0.9.0
+    volumes:
+      - lnx:/index
+    deploy:
+      replicas: 0
