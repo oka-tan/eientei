@@ -1,7 +1,0 @@
-{
-	"PostgresConfig": {
-		"ConnectionString": "postgres://eientei:eientei@db:5432/eientei?sslmode=disable"
-	},
-	"Hosts": ["tewi.eientei.moe"],
-	"Production": false
-}

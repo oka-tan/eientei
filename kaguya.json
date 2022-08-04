@@ -1,0 +1,39 @@
+{
+	"S3Config": {
+		"S3Endpoint": "s3:9000",
+		"S3AccessKeyID": "minio",
+		"S3SecretAccessKey": "12345678",
+		"S3UseSSL": false,
+		"S3BucketName": "ayase",
+		"S3Region": "us-west-1"
+	},
+	"APIConfig": {
+		"RequestTimeout": "30s",
+		"Host": "https://a.4cdn.org",
+		"Goroutines": 4,
+		"NapTime": "0.2s"
+	},
+	"ImagesConfig": {
+		"RequestTimeout": "20s",
+		"Host": "https://is2.4chan.org",
+		"Goroutines": 3
+	},
+	"ThumbnailsConfig": {
+		"RequestTimeout": "20s",
+		"Host": "https://is2.4chan.org",
+		"Goroutines": 3
+	},
+	"PostgresConfig": {
+		"BatchSize": 50,
+		"ConnectionString": "postgres://postgres:12345678@postgres:5432/postgres?sslmode=disable"
+	},
+	"Boards": [
+		{
+			"Name": "po",
+			"LongNapTime": "50s",
+			"Thumbnails": true,
+			"Media": false,
+			"SkipArchive": false
+		}
+	]
+}

@@ -1,266 +1,95 @@
-CREATE TYPE board AS ENUM (
-	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'gif', 'h', 'hr', 'k', 'm', 'o', 'p', 'r', 's', 't', 'u', 'v', 'vg', 'vm', 'vr', 'vrpg', 'vst', 'w', 'wg', 'i', 'ic', 'r9k', 's4s', 'vip', 'qa', 'cm', 'hm', 'lgbt', 'y', '3', 'aco', 'adv', 'an', 'bant', 'biz', 'cgl', 'ck', 'co', 'diy', 'fa', 'fit', 'gd', 'hc', 'his', 'int', 'jp', 'lit', 'mlp', 'mu', 'news', 'out', 'po', 'pol', 'pw', 'qst', 'sci', 'soc', 'sp', 'tg', 'toy', 'trv', 'tv', 'vp', 'vt', 'wsg', 'wsr', 'x', 'xs'
-);
-
-CREATE TYPE ext AS ENUM (
-	'.jpg', '.png', '.gif', '.swf', '.pdf', '.webm'
-);
-
-CREATE TYPE capcode AS ENUM (
-	'mod', 'admin', 'admin_highlight', 'manager', 'developer', 'founder'
-);
-
 CREATE TABLE post (
-	board board NOT NULL,
-	no BIGINT NOT NULL,
-	resto BIGINT NOT NULL,
-	time TIMESTAMP WITHOUT TIME ZONE,
-	name TEXT,
-	trip TEXT,
-	capcode CAPCODE,
-	country TEXT,
-	since4pass SMALLINT,
-	sub TEXT,
-	com TEXT,
-	tim BIGINT,
-	md5 TEXT,
-	filename TEXT,
-	ext EXT,
-	fsize BIGINT,
-	w SMALLINT,
-	h SMALLINT,
-	tn_w SMALLINT,
-	tn_h SMALLINT,
-	deleted BOOLEAN NOT NULL,
-	file_deleted BOOLEAN NOT NULL,
-	spoiler BOOLEAN NOT NULL,
-	custom_spoiler SMALLINT,
-	op BOOLEAN NOT NULL,
-	sticky BOOLEAN NOT NULL,
-	name_tsvector TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', name)) STORED,
-	sub_tsvector TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', sub)) STORED,
-	com_tsvector TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', com)) STORED,
-	filename_tsvector TSVECTOR GENERATED ALWAYS AS (to_tsvector('english', filename)) STORED,
-    last_modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    board TEXT NOT NULL,
+    post_number BIGINT NOT NULL CHECK(post_number > 0),
+    thread_number BIGINT NOT NULL CHECK(thread_number > 0),
+    op BOOLEAN NOT NULL CHECK(op = (post_number = thread_number)),
+    deleted BOOLEAN NOT NULL,
+    hidden BOOLEAN NOT NULL,
+    time_posted TIMESTAMP WITH TIME ZONE NOT NULL,
+    last_modified TIMESTAMP WITH TIME ZONE NOT NULL CHECK(last_modified >= created_at),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL CHECK(created_at >= time_posted),
+    name TEXT CHECK(name != '' AND name != 'Anonymous'),
+    tripcode TEXT CHECK(tripcode != ''),
+    capcode TEXT CHECK(capcode != ''),
+    poster_id TEXT CHECK(poster_id != ''),
+    country TEXT CHECK(country != ''),
+    flag TEXT CHECK(flag != ''),
+    email TEXT CHECK(email != ''),
+    subject TEXT CHECK(subject != ''),
+    comment TEXT CHECK(comment != ''),
+    has_media BOOLEAN NOT NULL,
+    media_deleted BOOLEAN,
+    time_media_deleted TIMESTAMP WITH TIME ZONE CHECK(time_media_deleted >= created_at AND last_modified >= time_media_deleted),
+    media_timestamp BIGINT CHECK(media_timestamp > 0),
+    media_4chan_hash BYTEA CHECK(OCTET_LENGTH(media_4chan_hash) > 0),
+    media_internal_hash BYTEA CHECK(OCTET_LENGTH(media_internal_hash) > 0),
+    thumbnail_internal_hash BYTEA CHECK(OCTET_LENGTH(thumbnail_internal_hash) > 0),
+    media_extension TEXT CHECK(media_extension != ''),
+    media_file_name TEXT CHECK(media_file_name != ''),
+    media_size INTEGER CHECK(media_size > 0),
+    media_height SMALLINT CHECK(media_height > 0),
+    media_width SMALLINT CHECK(media_width > 0),
+    thumbnail_height SMALLINT CHECK(thumbnail_height > 0),
+    thumbnail_width SMALLINT CHECK(thumbnail_width > 0),
+    spoiler BOOLEAN,
+    custom_spoiler SMALLINT CHECK(custom_spoiler > 0),
+    sticky BOOLEAN,
+    closed BOOLEAN,
+    posters SMALLINT CHECK(posters > 0),
+    replies SMALLINT CHECK(replies >= 0),
+    since4pass SMALLINT CHECK(since4pass > 2011),
+    
+    CONSTRAINT replies_need_to_come_after_the_op CHECK(post_number >= thread_number),
+    CONSTRAINT only_ops_have_subjects CHECK(op OR subject IS NULL),
+    CONSTRAINT either_a_post_has_a_country_or_a_flag CHECK(country IS NULL OR flag IS NULL),
+    CONSTRAINT only_posts_with_media_have_deleted_media CHECK(has_media OR media_deleted IS NULL),
+    CONSTRAINT only_posts_with_media_have_media_timestamps CHECK(has_media OR media_timestamp IS NULL),
+    CONSTRAINT only_posts_with_media_have_4chan_hashes CHECK(has_media OR media_4chan_hash IS NULL),
+    CONSTRAINT only_posts_with_media_have_internal_hashes CHECK(has_media OR media_internal_hash IS NULL),
+    CONSTRAINT only_posts_with_media_have_thumbnail_hashes CHECK(has_media OR thumbnail_internal_hash IS NULL),
+    CONSTRAINT only_posts_with_media_have_extensions CHECK(has_media OR media_extension IS NULL),
+    CONSTRAINT media_extensions_cannot_contain_dots CHECK(media_extension NOT LIKE '%.%'),
+    CONSTRAINT only_posts_with_media_have_file_names CHECK(has_media OR media_file_name IS NULL),
+    CONSTRAINT only_posts_with_media_have_media_sizes CHECK(has_media OR media_size IS NULL),
+    CONSTRAINT only_posts_with_media_have_media_dimensions CHECK(has_media OR (media_height IS NULL AND media_width IS NULL)),
+    CONSTRAINT either_both_media_dimensions_are_present_or_neither_is CHECK((media_height IS NULL) = (media_width IS NULL)),
+    CONSTRAINT only_posts_with_media_have_thumbnail_dimensions CHECK(has_media OR (thumbnail_height IS NULL and thumbnail_width IS NULL)),
+    CONSTRAINT either_both_thumbnail_dimensions_are_present_or_neither_is CHECK((thumbnail_height IS NULL) = (thumbnail_width IS NULL)),
+    CONSTRAINT only_posts_with_media_have_spoilers CHECK(has_media OR spoiler IS NULL),
+    CONSTRAINT only_posts_with_spoilers_have_custom_spoilers CHECK(spoiler IS TRUE OR custom_spoiler IS NULL),
+    CONSTRAINT either_op_posts_are_stickies_or_they_arent CHECK(op = (sticky IS NOT NULL)),
+    CONSTRAINT either_op_posts_are_closed_or_they_arent CHECK(op = (closed IS NOT NULL)),
+    CONSTRAINT only_op_posts_have_posters CHECK(op OR posters IS NULL),
+    CONSTRAINT only_op_posts_have_replies CHECK(op OR replies IS NULL),
 
-	PRIMARY KEY(board, no)
+    PRIMARY KEY(board, post_number)
 ) PARTITION BY LIST(board);
 
-
-CREATE TABLE post_a PARTITION OF post
-FOR VALUES IN ('a');
-
-CREATE TABLE post_c PARTITION OF post
-FOR VALUES IN ('c');
-
-CREATE TABLE post_d PARTITION OF post
-FOR VALUES IN ('d');
-
-CREATE TABLE post_e PARTITION OF post
-FOR VALUES IN ('e');
-
-CREATE TABLE post_g PARTITION OF post
-FOR VALUES IN ('g');
-
-CREATE TABLE post_gif PARTITION OF post
-FOR VALUES IN ('gif');
-
-CREATE TABLE post_h PARTITION OF post
-FOR VALUES IN ('h');
-
-CREATE TABLE post_hr PARTITION OF post
-FOR VALUES IN ('hr');
-
-CREATE TABLE post_k PARTITION OF post
-FOR VALUES IN ('k');
-
-CREATE TABLE post_m PARTITION OF post
-FOR VALUES IN ('m');
-
-CREATE TABLE post_o PARTITION OF post
-FOR VALUES IN ('o');
-
-CREATE TABLE post_p PARTITION OF post
-FOR VALUES IN ('p');
-
-CREATE TABLE post_r PARTITION OF post
-FOR VALUES IN ('r');
-
-CREATE TABLE post_s PARTITION OF post
-FOR VALUES IN ('s');
-
-CREATE TABLE post_t PARTITION OF post
-FOR VALUES IN ('t');
-
-CREATE TABLE post_u PARTITION OF post
-FOR VALUES IN ('u');
-
-CREATE TABLE post_v PARTITION OF post
-FOR VALUES IN ('v');
-
-CREATE TABLE post_vg PARTITION OF post
-FOR VALUES IN ('vg');
-
-CREATE TABLE post_vm PARTITION OF post
-FOR VALUES IN ('vm');
-
-CREATE TABLE post_vr PARTITION OF post
-FOR VALUES IN ('vr');
-
-CREATE TABLE post_vrpg PARTITION OF post
-FOR VALUES IN ('vrpg');
-
-CREATE TABLE post_vst PARTITION OF post
-FOR VALUES IN ('vst');
-
-CREATE TABLE post_w PARTITION OF post
-FOR VALUES IN ('w');
-
-CREATE TABLE post_wg PARTITION OF post
-FOR VALUES IN ('wg');
-
-CREATE TABLE post_i PARTITION OF post
-FOR VALUES IN ('i');
-
-CREATE TABLE post_ic PARTITION OF post
-FOR VALUES IN ('ic');
-
-CREATE TABLE post_r9k PARTITION OF post
-FOR VALUES IN ('r9k');
-
-CREATE TABLE post_s4s PARTITION OF post
-FOR VALUES IN ('s4s');
-
-CREATE TABLE post_vip PARTITION OF post
-FOR VALUES IN ('vip');
-
-CREATE TABLE post_qa PARTITION OF post
-FOR VALUES IN ('qa');
-
-CREATE TABLE post_cm PARTITION OF post
-FOR VALUES IN ('cm');
-
-CREATE TABLE post_hm PARTITION OF post
-FOR VALUES IN ('hm');
-
-CREATE TABLE post_lgbt PARTITION OF post
-FOR VALUES IN ('lgbt');
-
-CREATE TABLE post_y PARTITION OF post
-FOR VALUES IN ('y');
-
-CREATE TABLE post_3 PARTITION OF post
-FOR VALUES IN ('3');
-
-CREATE TABLE post_aco PARTITION OF post
-FOR VALUES IN ('aco');
-
-CREATE TABLE post_adv PARTITION OF post
-FOR VALUES IN ('adv');
-
-CREATE TABLE post_an PARTITION OF post
-FOR VALUES IN ('an');
-
-CREATE TABLE post_biz PARTITION OF post
-FOR VALUES IN ('biz');
-
-CREATE TABLE post_cgl PARTITION OF post
-FOR VALUES IN ('cgl');
-
-CREATE TABLE post_ck PARTITION OF post
-FOR VALUES IN ('ck');
-
-CREATE TABLE post_co PARTITION OF post
-FOR VALUES IN ('co');
-
-CREATE TABLE post_diy PARTITION OF post
-FOR VALUES IN ('diy');
-
-CREATE TABLE post_fa PARTITION OF post
-FOR VALUES IN ('fa');
-
-CREATE TABLE post_fit PARTITION OF post
-FOR VALUES IN ('fit');
-
-CREATE TABLE post_gd PARTITION OF post
-FOR VALUES IN ('gd');
-
-CREATE TABLE post_hc PARTITION OF post
-FOR VALUES IN ('hc');
-
-CREATE TABLE post_his PARTITION OF post
-FOR VALUES IN ('his');
-
-CREATE TABLE post_int PARTITION OF post
-FOR VALUES IN ('int');
-
-CREATE TABLE post_jp PARTITION OF post
-FOR VALUES IN ('jp');
-
-CREATE TABLE post_lit PARTITION OF post
-FOR VALUES IN ('lit');
-
-CREATE TABLE post_mlp PARTITION OF post
-FOR VALUES IN ('mlp');
-
-CREATE TABLE post_mu PARTITION OF post
-FOR VALUES IN ('mu');
-
-CREATE TABLE post_news PARTITION OF post
-FOR VALUES IN ('news');
-
-CREATE TABLE post_out PARTITION OF post
-FOR VALUES IN ('out');
-
-CREATE TABLE post_po PARTITION OF post
-FOR VALUES IN ('po');
-
-CREATE TABLE post_pol PARTITION OF post
-FOR VALUES IN ('pol');
-
-CREATE TABLE post_pw PARTITION OF post
-FOR VALUES IN ('pw');
-
-CREATE TABLE post_qst PARTITION OF post
-FOR VALUES IN ('qst');
-
-CREATE TABLE post_sci PARTITION OF post
-FOR VALUES IN ('sci');
-
-CREATE TABLE post_soc PARTITION OF post
-FOR VALUES IN ('soc');
-
-CREATE TABLE post_sp PARTITION OF post
-FOR VALUES IN ('sp');
-
-CREATE TABLE post_tg PARTITION OF post
-FOR VALUES IN ('tg');
-
-CREATE TABLE post_toy PARTITION OF post
-FOR VALUES IN ('toy');
-
-CREATE TABLE post_trv PARTITION OF post
-FOR VALUES IN ('trv');
-
-CREATE TABLE post_tv PARTITION OF post
-FOR VALUES IN ('tv');
-
-CREATE TABLE post_vp PARTITION OF post
-FOR VALUES IN ('vp');
-
-CREATE TABLE post_vt PARTITION OF post
-FOR VALUES IN ('vt');
-
-CREATE TABLE post_wsg PARTITION OF post
-FOR VALUES IN ('wsg');
-
-CREATE TABLE post_wsr PARTITION OF post
-FOR VALUES IN ('wsr');
-
-CREATE TABLE post_x PARTITION OF post
-FOR VALUES IN ('x');
-
-CREATE TABLE post_xs PARTITION OF post
-FOR VALUES IN ('xs');
-
+ALTER TABLE post ALTER COLUMN board SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN name SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN tripcode SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN capcode SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN poster_id SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN country SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN flag SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN email SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN subject SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN comment SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN media_4chan_hash SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN media_internal_hash SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN thumbnail_internal_hash SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN media_extension SET STORAGE EXTERNAL;
+ALTER TABLE post ALTER COLUMN media_file_name SET STORAGE EXTERNAL;
+
+CREATE INDEX post_thread_number_post_number_index ON post(thread_number, post_number);
+CREATE INDEX post_op_post_number_index ON post(post_number) WHERE op;
+CREATE INDEX post_last_modified_index ON post(last_modified, post_number);
+
+CREATE TABLE media (hash BYTEA PRIMARY KEY);
+ALTER TABLE media ALTER COLUMN hash SET STORAGE EXTERNAL;
+
+CREATE TABLE index_tracker(
+    board TEXT PRIMARY KEY,
+    last_modified TIMESTAMP WITH TIME ZONE NOT NULL,
+    post_number BIGINT NOT NULL
+);

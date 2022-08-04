@@ -1,0 +1,23 @@
+{
+	"Boards": [
+		{
+			"Name": "po",
+			"ForceRecreate": false
+		}
+	],
+	"PostgresConfig": {
+		"ConnectionString": "postgres://postgres:12345678@postgres:5432/postgres?sslmode=disable&timeout=30s"
+	},
+	"LnxConfig": {
+		"Host": "http://lnx",
+		"Port": 8000,
+		"Configuration": {
+			"ReaderThreads": 1,
+			"MaxConcurrency": 5,
+			"WriterBuffer": 3000,
+			"StripStopWords": true
+		},
+		"BatchSize": 200,
+		"NapTime": "10m"
+	}
+}

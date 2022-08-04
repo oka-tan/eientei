@@ -1,0 +1,25 @@
+{
+	"PostgresConfig": {
+		"ConnectionString": "postgres://postgres:12345678@postgres:5432/postgres?sslmode=disable"
+	},
+	"LnxConfig": {
+		"Host": "http://lnx",
+		"Port": 8000
+	},
+	"Hosts": [],
+	"Production": false,
+	"Boards": [
+		{
+			"Name": "po",
+			"Description": "Papercraft & Origami"
+		}
+	],
+	"CspConfig": "default-src 'self' http://s3.localhost http://cdn.localhost; style-src 'unsafe-inline' 'self' https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css; script-src 'self' https://cdnjs.cloudflare.com; font-src https://cdnjs.cloudflare.com;",
+	"TemplateConfig": {
+		"ImagesUrl": "http://s3.localhost/ayase",
+		"ThumbnailsUrl": "http://s3.localhost/ayase",
+		"FaviconUrl": "http://reisen.localhost/favicon.ico",
+		"JsUrl": "http://reisen.localhost/static/reisen.js",
+		"CssUrl": "http://reisen.localhost/static/reisen.css"
+	}
+}
