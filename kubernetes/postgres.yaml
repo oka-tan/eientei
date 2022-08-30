@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: eientei
+  labels:
+    app: postgres
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14.5-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: "POSTGRES_PASSWORD"
+              value: "12345678"
+            - name: "POSTGRES_USER"
+              value: "postgres"
+            - name: "POSTGRES_DB"
+              value: "postgres"
+            - name: "PGDATA"
+              value: "/var/lib/postgresql/data/14.5/"
+          volumeMounts:
+            - mountPath: "/var/lib/postgresql/data"
+              name: postgres
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: eientei
+  labels:
+    app: postgres
+spec:
+  type: ClusterIP
+  ports:
+   - port: 5432
+  selector:
+   app: postgres

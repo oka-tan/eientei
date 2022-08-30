@@ -10,16 +10,38 @@
 	"Production": false,
 	"Boards": [
 		{
-			"Name": "po",
-			"Description": "Papercraft & Origami"
+			"Name": "sci",
+			"Description": "Science & Maths",
+			"EnableLatex": true
 		}
 	],
-	"CspConfig": "default-src 'self' http://s3.localhost http://cdn.localhost; style-src 'unsafe-inline' 'self' https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css; script-src 'self' https://cdnjs.cloudflare.com; font-src https://cdnjs.cloudflare.com;",
+	"CspConfig": "default-src 'self' http://s3.localhost; style-src 'unsafe-inline' 'self'; script-src 'self' https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js; font-src https://cdn.jsdelivr.net data:;",
 	"TemplateConfig": {
 		"ImagesUrl": "http://s3.localhost/ayase",
 		"ThumbnailsUrl": "http://s3.localhost/ayase",
+		"OekakiUrl": "http://s3.localhost/ayase",
 		"FaviconUrl": "http://reisen.localhost/favicon.ico",
 		"JsUrl": "http://reisen.localhost/static/reisen.js",
-		"CssUrl": "http://reisen.localhost/static/reisen.css"
+		"TailwindCssUrl": "http://reisen.localhost/static/tailwind.css",
+		"TegakiJsUrl": "http://reisen.localhost/static/tegaki.min.js",
+		"TegakiCssUrl": "http://reisen.localhost/static/tegaki.css",
+		"Themes": [
+			{
+				"Name": "Reisen Default Theme",
+				"Url": "/static/reisen.css"
+			},
+			{
+				"Name": "Reisen Tibix Theme",
+				"Url": "/static/reisen-tibix.css"
+			},
+			{
+				"Name": "Reisen RBT Theme",
+				"Url": "/static/reisen-rbt.css"
+			}
+		],
+		"DefaultTheme": {
+			"Name": "Reisen Default Theme",
+			"Url": "/static/reisen.css"
+		}
 	}
 }

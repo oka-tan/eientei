@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moon
+  namespace: eientei
+  labels:
+    app: moon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: moon
+  template:
+    metadata:
+      labels:
+        app: moon
+    spec:
+      containers:
+        - name: moon
+          image: ghcr.io/oka-tan/moon:0.0.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: "MOON_CONFIG"
+              value: "/etc/moon.json"
+          volumeMounts:
+            - name: moon-config
+              mountPath: "/etc/moon.json"
+              subPath: "moon.json"
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 500m
+            limits:
+              memory: 32Mi
+              cpu: 1
+      volumes:
+        - name: moon-config
+          configMap:
+            name: moon-config

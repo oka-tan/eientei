@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reisen
+  namespace: eientei
+  labels:
+    app: reisen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reisen
+  template:
+    metadata:
+      labels:
+        app: reisen
+    spec:
+      containers:
+        - name: reisen
+          image: ghcr.io/oka-tan/reisen:0.0.3
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: "REISEN_CONFIG"
+              value: "/etc/reisen.json"
+          volumeMounts:
+            - name: reisen-config
+              mountPath: "/etc/reisen.json"
+              subPath: "reisen.json"
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 500m
+            limits:
+              memory: 128Mi
+              cpu: 2
+      volumes:
+        - name: reisen-config
+          configMap:
+            name: reisen-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reisen
+  namespace: eientei
+  labels:
+    app: reisen
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 1323
+    protocol: TCP
+  selector:
+    app: reisen
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: reisen
+  namespace: eientei
+spec:
+  rules:
+    - host: "reisen.localhost"
+      http:
+        paths:
+        - path: "/"
+          pathType: Prefix
+          backend:
+            service:
+              name: reisen
+              port:
+                number: 80

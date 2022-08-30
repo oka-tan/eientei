@@ -84,7 +84,8 @@ ALTER TABLE post ALTER COLUMN media_file_name SET STORAGE EXTERNAL;
 
 CREATE INDEX post_thread_number_post_number_index ON post(thread_number, post_number);
 CREATE INDEX post_op_post_number_index ON post(post_number) WHERE op;
-CREATE INDEX post_last_modified_index ON post(last_modified, post_number);
+CREATE INDEX post_last_modified_post_number_index ON post(last_modified, post_number);
+CREATE INDEX post_media_4chan_hash_post_number_index ON post(media_4chan_hash, post_number) WHERE media_4chan_hash IS NOT NULL;
 
 CREATE TABLE media (hash BYTEA PRIMARY KEY);
 ALTER TABLE media ALTER COLUMN hash SET STORAGE EXTERNAL;
@@ -94,3 +95,4 @@ CREATE TABLE index_tracker(
     last_modified TIMESTAMP WITH TIME ZONE NOT NULL,
     post_number BIGINT NOT NULL
 );
+

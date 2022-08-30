@@ -1,7 +1,7 @@
 {
 	"Boards": [
 		{
-			"Name": "po",
+			"Name": "sci",
 			"ForceRecreate": false
 		}
 	],
@@ -14,10 +14,9 @@
 		"Configuration": {
 			"ReaderThreads": 1,
 			"MaxConcurrency": 5,
-			"WriterBuffer": 3000,
-			"StripStopWords": true
+			"WriterBuffer": 3000
 		},
 		"BatchSize": 200,
-		"NapTime": "10m"
+		"NapTime": "60s"
 	}
 }

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: lnx
+  namespace: eientei
+  labels:
+    app: lnx
+spec:
+  serviceName: lnx
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lnx
+  template:
+    metadata:
+      labels:
+        app: lnx
+    spec:
+      containers:
+        - name: lnx
+          image: chillfish8/lnx:0.9.0
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: "/index"
+              name: lnx
+  volumeClaimTemplates:
+    - metadata:
+        name: lnx
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lnx
+  namespace: eientei
+  labels:
+    app: lnx
+spec:
+  type: ClusterIP
+  ports:
+   - port: 8000
+  selector:
+   app: lnx

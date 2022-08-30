@@ -5,23 +5,28 @@
 		"S3SecretAccessKey": "12345678",
 		"S3UseSSL": false,
 		"S3BucketName": "ayase",
-		"S3Region": "us-west-1"
+		"S3Region": "us-east-2"
 	},
 	"APIConfig": {
 		"RequestTimeout": "30s",
 		"Host": "https://a.4cdn.org",
-		"Goroutines": 4,
-		"NapTime": "0.2s"
+		"Goroutines": 5,
+		"NapTime": "0.5s"
 	},
 	"ImagesConfig": {
 		"RequestTimeout": "20s",
 		"Host": "https://is2.4chan.org",
-		"Goroutines": 3
+		"Goroutines": 1
 	},
 	"ThumbnailsConfig": {
 		"RequestTimeout": "20s",
 		"Host": "https://is2.4chan.org",
-		"Goroutines": 3
+		"Goroutines": 1
+	},
+	"OekakiConfig": {
+		"RequestTimeout": "20s",
+		"Host": "https://is2.4chan.org",
+		"Goroutines": 1
 	},
 	"PostgresConfig": {
 		"BatchSize": 50,
@@ -29,11 +34,12 @@
 	},
 	"Boards": [
 		{
-			"Name": "po",
-			"LongNapTime": "50s",
+			"Name": "sci",
+			"LongNapTime": "20s",
 			"Thumbnails": true,
 			"Media": false,
-			"SkipArchive": false
+			"Oekaki": false,
+			"SkipArchive": true
 		}
 	]
 }

@@ -9,7 +9,7 @@ volumes:
 
 services:
   reisen:
-    image: ghcr.io/oka-tan/reisen:0.0.1
+    image: ghcr.io/oka-tan/reisen:0.0.3
     environment:
       - REISEN_CONFIG=/etc/reisen.json
     volumes:
@@ -18,7 +18,7 @@ services:
       replicas: 1
 
   moon:
-    image: ghcr.io/oka-tan/moon:0.0.1
+    image: ghcr.io/oka-tan/moon:0.0.2
     environment:
       - MOON_CONFIG=/etc/moon.json
     volumes:
@@ -27,7 +27,7 @@ services:
       replicas: 0
 
   kaguya:
-    image: ghcr.io/oka-tan/kaguya:0.0.1
+    image: ghcr.io/oka-tan/kaguya:0.0.3
     environment:
       - KAGUYA_CONFIG=/etc/kaguya.json
     volumes:
@@ -78,7 +78,7 @@ services:
       - "80:80"
 
   postgres:
-    image: postgres:14.4-alpine
+    image: postgres:14.5-alpine
     environment:
       - POSTGRES_PASSWORD=12345678
       - POSTGRES_USER=postgres
@@ -99,12 +99,8 @@ services:
       - "9000:9000"
     volumes:
       - s3:/data
-    deploy:
-      replicas: 1
 
   lnx:
     image: chillfish8/lnx:0.9.0
     volumes:
       - lnx:/index
-    deploy:
-      replicas: 0

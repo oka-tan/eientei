@@ -22,3 +22,9 @@ Essentially, configure mokou.json to point it to your actual asagi database and 
 
 Not yet. Also, don't deploy docker-compose to production.
 
+## Kubernetes
+
+Half-assed kubernetes deployment can be done with
+
+```sudo sh bootstrap-kubernetes.sh```
+
